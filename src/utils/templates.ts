@@ -142,13 +142,14 @@ export function buildContent(type: ContentType, values: Record<string, string>):
 }
 
 /**
- * The string actually encoded in the QR code. Types without a structural
- * prefix (only "url") have no skeleton to pre-fill, so they fall back to the
- * site URL until the user types something.
+ * The string actually encoded in the QR code. Free-form types (text, url) have
+ * no structural prefix to pre-fill, so they fall back to the site URL while the
+ * field is empty — the default QR always points somewhere useful.
  */
 export function qrPayload(type: ContentType, content: string): string {
   if (content.trim()) return content
-  return type === 'url' ? SITE_URL : content
+  const freeform = type === 'url' || type === 'text'
+  return freeform ? SITE_URL : content
 }
 
 function splitEscaped(input: string, sep: string): string[] {

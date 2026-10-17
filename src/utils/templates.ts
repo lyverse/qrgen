@@ -69,8 +69,11 @@ export const contentTemplates: ContentTemplate[] = [
   {
     type: 'phone',
     label: 'Phone',
-    hint: 'Start a call. Format: tel:<number>',
-    value: '',
+    hint: 'Start a call. The tel: prefix is added automatically.',
+    value: 'tel:',
+    fields: [
+      { key: 'number', label: 'Phone number', kind: 'tel', placeholder: '+1234567890' },
+    ],
   },
   {
     type: 'sms',
@@ -124,6 +127,8 @@ export function buildContent(type: ContentType, values: Record<string, string>):
       return buildWifi(values)
     case 'email':
       return buildEmail(values)
+    case 'phone':
+      return buildPhone(values)
     case 'sms':
       return buildSms(values)
     case 'vcard':
@@ -174,6 +179,8 @@ function parseByType(type: ContentType, content: string): Record<string, string>
       return parseWifi(content)
     case 'email':
       return parseEmail(content)
+    case 'phone':
+      return parsePhone(content)
     case 'sms':
       return parseSms(content)
     case 'vcard':
@@ -237,6 +244,14 @@ function buildEmail(values: Record<string, string>): string {
   if (values.body) params.push(`body=${encodeURIComponent(values.body)}`)
   if (params.length) out += `?${params.join('&')}`
   return out
+}
+
+function parsePhone(content: string): Record<string, string> {
+  return { number: content.replace(/^tel:/i, '') }
+}
+
+function buildPhone(values: Record<string, string>): string {
+  return `tel:${values.number ?? ''}`
 }
 
 function parseSms(content: string): Record<string, string> {

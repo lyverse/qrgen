@@ -1,13 +1,26 @@
 import { useRef, useState } from 'react'
 import { useStore } from '@/store/useStore'
 import { useShallow } from 'zustand/react/shallow'
-import { Type, ImageIcon } from 'lucide-react'
+import { Image as ImageIcon, Settings2 } from 'lucide-react'
 import { contentTemplates, templateFor } from '@/utils/templates'
 import { palettes } from '@/utils/palettes'
 import type { ContentType, DotStyle, Ecc, EyeStyle } from '@/types'
 
 const dotStyles: DotStyle[] = ['square', 'rounded', 'dots', 'diamond']
+const dotLabels: Record<DotStyle, string> = {
+  square: 'Square',
+  rounded: 'Rounded',
+  dots: 'Dots',
+  diamond: 'Diamond',
+}
+
 const eyeStyles: EyeStyle[] = ['square', 'rounded', 'circle']
+const eyeLabels: Record<EyeStyle, string> = {
+  square: 'Square',
+  rounded: 'Rounded',
+  circle: 'Circle',
+}
+
 const eccLevels: Ecc[] = ['L', 'M', 'Q', 'H']
 const exportSizes = [256, 512, 1024, 2048]
 
@@ -21,11 +34,65 @@ function hexLuminance(hex: string): number {
   return 0.2126 * r + 0.7152 * g + 0.0722 * b
 }
 
+function DotIcon({ style }: { style: DotStyle }) {
+  return (
+    <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true" fill="currentColor">
+      {style === 'square' && <rect x="3" y="3" width="14" height="14" />}
+      {style === 'rounded' && <rect x="3" y="3" width="14" height="14" rx="4" />}
+      {style === 'dots' && <circle cx="10" cy="10" r="7" />}
+      {style === 'diamond' && <polygon points="10,2 18,10 10,18 2,10" />}
+    </svg>
+  )
+}
+
+function EyeIcon({ style }: { style: EyeStyle }) {
+  return (
+    <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+      {style === 'square' && (
+        <>
+          <rect x="2.5" y="2.5" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="3" />
+          <rect x="7" y="7" width="6" height="6" fill="currentColor" />
+        </>
+      )}
+      {style === 'rounded' && (
+        <>
+          <rect x="2.5" y="2.5" width="15" height="15" rx="5" fill="none" stroke="currentColor" strokeWidth="3" />
+          <rect x="7" y="7" width="6" height="6" rx="2" fill="currentColor" />
+        </>
+      )}
+      {style === 'circle' && (
+        <>
+          <circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" strokeWidth="3" />
+          <circle cx="10" cy="10" r="3" fill="currentColor" />
+        </>
+      )}
+    </svg>
+  )
+}
+
+function Chevron({ open, className }: { open: boolean; className?: string }) {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      className={className}
+      style={{ transform: open ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 0.15s' }}
+    >
+      <path d="M9 18l6-6-6-6" />
+    </svg>
+  )
+}
+
 export function Controls() {
   const config = useStore(useShallow((s) => s.config))
   const updateConfig = useStore((s) => s.updateConfig)
   const sidebarOpen = useStore((s) => s.sidebarOpen)
   const matrix = useStore((s) => s.matrix)
+  const toggleSidebar = useStore((s) => s.toggleSidebar)
   const [showAdvanced, setShowAdvanced] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
 
@@ -48,10 +115,10 @@ export function Controls() {
 
   return (
     <div className="controls-panel">
-      <div className="panel-header panel-header--clickable" onClick={() => useStore.getState().toggleSidebar()}>
-        <Type size={14} />
+      <div className="panel-header panel-header--clickable" onClick={toggleSidebar}>
+        <Settings2 size={14} />
         <span>Controls</span>
-        <Chevron open={sidebarOpen} degrees={90} />
+        <Chevron open={sidebarOpen} className="sidebar-chevron" />
       </div>
 
       <div className="panel-body">
@@ -104,17 +171,23 @@ export function Controls() {
             <div className="color-divider" />
             <ColorField label="Background" value={config.bg} onChange={(v) => updateConfig({ bg: v })} />
           </div>
-          <label className="toggle-label color-transparent">
-            <input
-              type="checkbox"
-              checked={config.transparentBg}
-              onChange={(e) => updateConfig({ transparentBg: e.target.checked })}
-            />
-            <span>Transparent background</span>
-          </label>
 
+          <span className="qr-sub-label">Background</span>
           <div className="control-row">
-            <label className="control-label">Gradient</label>
+            <label className="control-label">Transparent</label>
+            <label className="toggle">
+              <input
+                type="checkbox"
+                checked={config.transparentBg}
+                onChange={(e) => updateConfig({ transparentBg: e.target.checked })}
+              />
+              <span className="toggle-slider" />
+            </label>
+          </div>
+
+          <span className="qr-sub-label">Gradient</span>
+          <div className="control-row">
+            <label className="control-label">Enabled</label>
             <label className="toggle">
               <input
                 type="checkbox"
@@ -171,67 +244,71 @@ export function Controls() {
           )}
         </div>
 
-        {/* Modules */}
+        {/* Shape */}
         <div className="control-group">
-          <label className="control-label">Dot Style</label>
-          <div className="qr-segment">
+          <label className="control-label">Shape</label>
+
+          <span className="qr-sub-label">Dots</span>
+          <div className="qr-style-grid qr-style-grid--4">
             {dotStyles.map((s) => (
               <button
                 key={s}
-                className={`btn btn-xs${config.dotStyle === s ? ' btn-selected' : ''}`}
+                className={`qr-style-btn${config.dotStyle === s ? ' is-selected' : ''}`}
                 onClick={() => updateConfig({ dotStyle: s })}
+                title={dotLabels[s]}
               >
-                {s}
+                <DotIcon style={s} />
+                <span>{dotLabels[s]}</span>
               </button>
             ))}
           </div>
-        </div>
 
-        <div className="control-group">
-          <label className="control-label">Eye Style</label>
-          <div className="qr-segment">
+          <span className="qr-sub-label">Eyes</span>
+          <div className="qr-style-grid qr-style-grid--3">
             {eyeStyles.map((s) => (
               <button
                 key={s}
-                className={`btn btn-xs${config.eyeStyle === s ? ' btn-selected' : ''}`}
+                className={`qr-style-btn${config.eyeStyle === s ? ' is-selected' : ''}`}
                 onClick={() => updateConfig({ eyeStyle: s })}
+                title={eyeLabels[s]}
               >
-                {s}
+                <EyeIcon style={s} />
+                <span>{eyeLabels[s]}</span>
               </button>
             ))}
           </div>
-        </div>
 
-        <div className="control-group row">
-          <label className="control-label">Eye Color</label>
-          <label className="toggle">
-            <input
-              type="checkbox"
-              checked={config.useEyeColor}
-              onChange={(e) => updateConfig({ useEyeColor: e.target.checked })}
-            />
-            <span className="toggle-slider" />
-          </label>
-        </div>
-        {config.useEyeColor && (
-          <div className="control-group">
-            <ColorField label="Eyes" value={config.eyeColor} onChange={(v) => updateConfig({ eyeColor: v })} />
+          <div className="control-row qr-block">
+            <label className="control-label">Eye Color</label>
+            <label className="toggle">
+              <input
+                type="checkbox"
+                checked={config.useEyeColor}
+                onChange={(e) => updateConfig({ useEyeColor: e.target.checked })}
+              />
+              <span className="toggle-slider" />
+            </label>
           </div>
-        )}
+          {config.useEyeColor && (
+            <div className="qr-block">
+              <ColorField label="Eyes" value={config.eyeColor} onChange={(v) => updateConfig({ eyeColor: v })} />
+            </div>
+          )}
 
-        <div className="control-group">
-          <label className="control-label">
-            Quiet Zone
-            <span className="control-value">{config.quietZone}</span>
-          </label>
-          <div className="range-group">
-            <input
-              type="range"
-              min={0}
-              max={8}
-              value={config.quietZone}
-              onChange={(e) => updateConfig({ quietZone: Number(e.target.value) })}
-            />
+          <div className="qr-block">
+            <label className="control-label">
+              Quiet Zone
+              <span className="control-value">{config.quietZone}</span>
+            </label>
+            <div className="range-group">
+              <input
+                type="range"
+                min={0}
+                max={8}
+                value={config.quietZone}
+                onChange={(e) => updateConfig({ quietZone: Number(e.target.value) })}
+              />
+            </div>
           </div>
         </div>
 
@@ -239,11 +316,11 @@ export function Controls() {
         <div className="control-group">
           <label className="control-label clickable" onClick={() => setShowAdvanced((v) => !v)}>
             <span>Advanced</span>
-            <Chevron open={showAdvanced} degrees={90} />
+            <Chevron open={showAdvanced} />
           </label>
           <div className={`collapsible-content${showAdvanced ? ' collapsible-content--open' : ''}`}>
             <div>
-              <div className="control-row">
+              <div className="control-row" style={{ marginTop: 14 }}>
                 <label className="control-label">Error Correction</label>
                 <select
                   className="preset-select"
@@ -269,31 +346,29 @@ export function Controls() {
                 </select>
               </div>
 
-              <div className="control-group">
-                <label className="control-label">Logo</label>
-                {config.logo ? (
-                  <div className="qr-logo-row">
-                    <img src={config.logo} alt="Logo" className="qr-logo-thumb" />
-                    <button className="btn btn-xs" onClick={() => updateConfig({ logo: null })}>Remove</button>
-                  </div>
-                ) : (
-                  <button className="btn btn-sm" onClick={() => fileRef.current?.click()}>
-                    <ImageIcon size={14} />
-                    Upload Logo
-                  </button>
-                )}
-                <input
-                  ref={fileRef}
-                  type="file"
-                  accept="image/*"
-                  hidden
-                  onChange={(e) => handleLogo(e.target.files?.[0])}
-                />
-              </div>
+          <span className="qr-sub-label">Logo</span>
+              {config.logo ? (
+                <div className="qr-logo-row">
+                  <img src={config.logo} alt="Logo" className="qr-logo-thumb" />
+                  <button className="btn btn-xs" onClick={() => updateConfig({ logo: null })}>Remove</button>
+                </div>
+              ) : (
+                <button className="btn btn-sm" onClick={() => fileRef.current?.click()}>
+                  <ImageIcon size={14} />
+                  Upload Logo
+                </button>
+              )}
+              <input
+                ref={fileRef}
+                type="file"
+                accept="image/*"
+                hidden
+                onChange={(e) => handleLogo(e.target.files?.[0])}
+              />
 
               {config.logo && (
                 <>
-                  <div className="control-group">
+                  <div className="qr-block">
                     <label className="control-label">
                       Logo Size
                       <span className="control-value">{Math.round(config.logoSize * 100)}%</span>
@@ -309,7 +384,7 @@ export function Controls() {
                       />
                     </div>
                   </div>
-                  <div className="control-row">
+                  <div className="control-row qr-block">
                     <label className="control-label">Clear Padding</label>
                     <label className="toggle">
                       <input
@@ -326,9 +401,9 @@ export function Controls() {
               {matrix && (
                 <div className="qr-meta">
                   <span>Version {matrix.version}</span>
-                  <span className="qr-dot">·</span>
+                  <span className="qr-dot">/</span>
                   <span>{matrix.size}×{matrix.size}</span>
-                  <span className="qr-dot">·</span>
+                  <span className="qr-dot">/</span>
                   <span>ECC {matrix.ecc}</span>
                 </div>
               )}
@@ -352,22 +427,6 @@ export function Controls() {
         )}
       </div>
     </div>
-  )
-}
-
-function Chevron({ open, degrees }: { open: boolean; degrees: number }) {
-  return (
-    <svg
-      width="14"
-      height="14"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      style={{ transform: open ? `rotate(${degrees}deg)` : 'rotate(0deg)', transition: 'transform 0.15s' }}
-    >
-      <path d="M9 18l6-6-6-6" />
-    </svg>
   )
 }
 

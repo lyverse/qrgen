@@ -1,0 +1,12 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": [
+    "QRgen is a client-side QR code generator web app. React 18 + TypeScript 5 + Vite 6 + Zustand 5. Plain CSS (no Tailwind). lucide-react icons.",
+    "QR matrix is generated with the 'qrcode' npm package (QRCode.create). Rendering is fully custom: canvas for preview/PNG/JPEG and a string builder for SVG.",
+    "Project at ~/qrgen (Fedora). Dev server: http://localhost:5173/qrgen/. GitHub: https://github.com/lyverse/qrgen. Deploy target: Cloudflare Pages (build from main, command 'npm run build', output 'dist'). Base path: '/' when CF_PAGES is set, otherwise '/qrgen/'.",
+    "Source: src/types/index.ts (QrConfig, Preset), src/utils/qr.ts (buildMatrix, finder detection), src/utils/renderCanvas.ts (paintQr: modules, eyes, gradient, logo), src/utils/renderSvg.ts (buildSvg), src/utils/exporters.ts (PNG/JPEG/SVG + clipboard), src/utils/share.ts (config in URL hash, logo excluded), src/utils/palettes.ts (color presets), src/utils/templates.ts (Text/Link/Wi-Fi/Email/Phone/SMS/vCard), src/store/useStore.ts (Zustand + localStorage presets + undo/redo), src/hooks/useQrCode.ts (content+ecc -> matrix), src/hooks/useLogo.ts (data URL -> HTMLImageElement), src/components/ (Header, Controls, QrPreview, ExportMenu, StatusBar, WaveBackground). CSS in src/index.css. Entry: src/main.tsx.",
+    "Code style: 2-space indent, no semicolons, single quotes, trailing commas in multiline. @/ alias maps to src/. Zustand pattern: const val = useStore((s) => s.prop); const obj = useStore(useShallow((s) => s.obj)).",
+    "Features: content types with templates, error correction L/M/Q/H, quiet zone, dot styles (square/rounded/dots/diamond), eye styles (square/rounded/circle) with optional eye color, foreground/background colors, transparent background, linear/radial gradient, optional center logo with size and padding, export size, presets, share link, undo/redo (Ctrl/Cmd+Z, Ctrl/Cmd+Shift+Z), export PNG/JPEG/SVG, copy PNG to clipboard, About modal with WaveBackground, responsive mobile layout with sidebar accordion.",
+    "GitHub username: lyverse."
+  ]
+}

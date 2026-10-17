@@ -1861,6 +1861,7 @@ body {
 .qr-preview .preview-canvas-wrapper {
   padding: 0;
   overflow: hidden;
+  touch-action: auto;
   background: radial-gradient(circle at 50% 42%, rgba(255, 255, 255, 0.035), transparent 62%);
 }
 
@@ -1870,10 +1871,6 @@ body {
   align-items: center;
   gap: 16px;
   padding: 28px;
-}
-
-.qr-zoom-layer {
-  will-change: transform;
 }
 
 .qr-card {
@@ -1906,28 +1903,6 @@ body {
   letter-spacing: 1.5px;
   text-transform: uppercase;
   color: var(--text-muted);
-}
-
-.qr-zoom {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.qr-zoom-label {
-  min-width: 50px;
-  padding: 4px 6px;
-  border: none;
-  background: none;
-  font-family: var(--font-mono);
-  font-size: 12px;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: color 0.15s;
-}
-
-.qr-zoom-label:hover {
-  color: var(--text-primary);
 }
 
 .qr-empty {

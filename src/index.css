@@ -1972,22 +1972,8 @@ textarea:focus::placeholder {
 
 .qr-canvas {
   display: block;
-  position: absolute;
-  inset: 0;
   width: 100%;
   height: 100%;
-  opacity: 0;
-  transition: opacity 180ms ease;
-}
-
-.qr-canvas.is-active {
-  opacity: 1;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .qr-canvas {
-    transition: none;
-  }
 }
 
 .qr-caption {

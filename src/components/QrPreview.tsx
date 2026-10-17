@@ -4,7 +4,6 @@ import { useStore } from '@/store/useStore'
 import { useShallow } from 'zustand/react/shallow'
 import { useLogo } from '@/hooks/useLogo'
 import { paintQr } from '@/utils/renderCanvas'
-import type { QrMatrix } from '@/utils/qr'
 
 const RESOLUTION = 1024
 
@@ -14,15 +13,8 @@ export function QrPreview() {
   const error = useStore((s) => s.error)
   const logo = useLogo(config.logo)
 
+  const canvasRef = useRef<HTMLCanvasElement>(null)
   const wrapperRef = useRef<HTMLDivElement>(null)
-  // Two stacked canvases alternate as the visible frame: while the front one
-  // fades out, the freshly painted back one fades in, giving a cross-fade
-  // between previews as the user types.
-  const canvasARef = useRef<HTMLCanvasElement>(null)
-  const canvasBRef = useRef<HTMLCanvasElement>(null)
-  const activeRef = useRef<'a' | 'b'>('a')
-  const prevMatrixRef = useRef<QrMatrix | null>(null)
-  const [active, setActive] = useState<'a' | 'b'>('a')
   const [fit, setFit] = useState(360)
 
   useEffect(() => {
@@ -39,31 +31,13 @@ export function QrPreview() {
   }, [])
 
   useEffect(() => {
-    const canvasA = canvasARef.current
-    const canvasB = canvasBRef.current
-    if (!canvasA || !canvasB || !matrix) return
-
-    const front = activeRef.current === 'a' ? canvasA : canvasB
-    const back = activeRef.current === 'a' ? canvasB : canvasA
-
-    // A new matrix (content/ecc change) cross-fades from the previous frame;
-    // a style-only change repaints the visible canvas in place.
-    const contentChanged = prevMatrixRef.current !== null && prevMatrixRef.current !== matrix
-    const target = contentChanged ? back : front
-
-    target.width = RESOLUTION
-    target.height = RESOLUTION
-    const ctx = target.getContext('2d')
+    const canvas = canvasRef.current
+    if (!canvas || !matrix) return
+    const ctx = canvas.getContext('2d')
     if (!ctx) return
+    canvas.width = RESOLUTION
+    canvas.height = RESOLUTION
     paintQr(ctx, RESOLUTION, RESOLUTION, matrix, config, { logo })
-
-    prevMatrixRef.current = matrix
-
-    if (contentChanged) {
-      const next = activeRef.current === 'a' ? 'b' : 'a'
-      activeRef.current = next
-      setActive(next)
-    }
   }, [matrix, config, logo])
 
   return (
@@ -94,8 +68,7 @@ export function QrPreview() {
               style={{ width: fit, height: fit }}
             >
               <div className="qr-canvas-stack">
-                <canvas ref={canvasARef} className={`qr-canvas${active === 'a' ? ' is-active' : ''}`} />
-                <canvas ref={canvasBRef} className={`qr-canvas${active === 'b' ? ' is-active' : ''}`} />
+                <canvas ref={canvasRef} className="qr-canvas" />
               </div>
             </div>
             <div className="qr-caption">

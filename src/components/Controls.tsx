@@ -70,7 +70,16 @@ function EyeIcon({ style }: { style: EyeStyle }) {
   )
 }
 
-function Chevron({ open, className }: { open: boolean; className?: string }) {
+function Chevron({
+  open,
+  className,
+  vertical,
+}: {
+  open: boolean
+  className?: string
+  vertical?: boolean
+}) {
+  const rotation = vertical ? (open ? 90 : -90) : open ? 90 : 0
   return (
     <svg
       width="14"
@@ -80,7 +89,7 @@ function Chevron({ open, className }: { open: boolean; className?: string }) {
       stroke="currentColor"
       strokeWidth="2"
       className={className}
-      style={{ transform: open ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 0.15s' }}
+      style={{ transform: `rotate(${rotation}deg)`, transition: 'transform 0.15s' }}
     >
       <path d="M9 18l6-6-6-6" />
     </svg>
@@ -118,7 +127,7 @@ export function Controls() {
       <div className="panel-header panel-header--clickable" onClick={toggleSidebar}>
         <Settings2 size={14} />
         <span>Controls</span>
-        <Chevron open={sidebarOpen} className="sidebar-chevron" />
+        <Chevron open={sidebarOpen} className="sidebar-chevron" vertical />
       </div>
 
       <div className="panel-body">

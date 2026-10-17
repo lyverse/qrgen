@@ -47,7 +47,7 @@ export const contentTemplates: ContentTemplate[] = [
     type: 'wifi',
     label: 'Wi-Fi',
     hint: 'Join a Wi-Fi network.',
-    value: '',
+    value: 'WIFI:T:WPA;;',
     fields: [
       { key: 'ssid', label: 'Network name', placeholder: 'MyNetwork' },
       { key: 'password', label: 'Password', kind: 'password', placeholder: '••••••••' },
@@ -59,7 +59,7 @@ export const contentTemplates: ContentTemplate[] = [
     type: 'email',
     label: 'Email',
     hint: 'Pre-fill an email draft.',
-    value: '',
+    value: 'mailto:',
     fields: [
       { key: 'to', label: 'To', kind: 'email', placeholder: 'hello@example.com' },
       { key: 'subject', label: 'Subject', placeholder: 'Hi' },
@@ -76,7 +76,7 @@ export const contentTemplates: ContentTemplate[] = [
     type: 'sms',
     label: 'SMS',
     hint: 'Pre-fill a text message.',
-    value: '',
+    value: 'SMSTO::',
     fields: [
       { key: 'number', label: 'Phone number', kind: 'tel', placeholder: '+1234567890' },
       { key: 'message', label: 'Message', kind: 'textarea', placeholder: 'Hello' },
@@ -86,7 +86,7 @@ export const contentTemplates: ContentTemplate[] = [
     type: 'vcard',
     label: 'vCard',
     hint: 'Share a contact card.',
-    value: '',
+    value: ['BEGIN:VCARD', 'VERSION:3.0', 'END:VCARD'].join('\n'),
     fields: [
       { key: 'firstName', label: 'First name', placeholder: 'Jane', half: true },
       { key: 'lastName', label: 'Last name', placeholder: 'Doe', half: true },

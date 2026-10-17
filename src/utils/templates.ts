@@ -25,6 +25,8 @@ export interface ContentTemplate {
   label: string
   hint: string
   value: string
+  /** Placeholder for the raw textarea (used when the content has no skeleton). */
+  placeholder?: string
   fields?: ContentField[]
 }
 
@@ -41,7 +43,8 @@ export const contentTemplates: ContentTemplate[] = [
     type: 'url',
     label: 'Link',
     hint: 'A website or deep link.',
-    value: SITE_URL,
+    value: '',
+    placeholder: SITE_URL,
   },
   {
     type: 'wifi',
@@ -136,6 +139,16 @@ export function buildContent(type: ContentType, values: Record<string, string>):
     default:
       return values.content ?? ''
   }
+}
+
+/**
+ * The string actually encoded in the QR code. Types without a structural
+ * prefix (only "url") have no skeleton to pre-fill, so they fall back to the
+ * site URL until the user types something.
+ */
+export function qrPayload(type: ContentType, content: string): string {
+  if (content.trim()) return content
+  return type === 'url' ? SITE_URL : content
 }
 
 function splitEscaped(input: string, sep: string): string[] {

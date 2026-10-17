@@ -273,7 +273,7 @@ export function Controls() {
               value={config.content}
               spellCheck={false}
               onChange={(e) => updateConfig({ content: e.target.value })}
-              placeholder="Enter content..."
+              placeholder={template.placeholder ?? 'Enter content...'}
             />
           )}
           <p className="help-text">{template.hint}</p>

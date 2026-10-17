@@ -1,11 +1,10 @@
 import { create } from 'zustand'
 import type { Preset, QrConfig } from '@/types'
 import type { QrMatrix } from '@/utils/qr'
-import { SITE_URL } from '@/site'
 
 export const defaultConfig: QrConfig = {
   contentType: 'url',
-  content: SITE_URL,
+  content: '',
   ecc: 'M',
   quietZone: 4,
   fg: '#000000',

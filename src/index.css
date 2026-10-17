@@ -7,6 +7,7 @@
   --text-primary: #ffffff;
   --text-secondary: #888888;
   --text-muted: #666666;
+  --text-placeholder: #555555;
   --accent: #ffffff;
   --accent-hover: #cccccc;
   --accent-dim: #333333;
@@ -1140,6 +1141,19 @@ body {
 
 .input.mono {
   font-family: var(--font-mono);
+}
+
+/* Placeholders: greyed hint text that clears as soon as the field is focused */
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-placeholder);
+  opacity: 1;
+  transition: color 0.15s ease;
+}
+
+input:focus::placeholder,
+textarea:focus::placeholder {
+  color: transparent;
 }
 
 /* Color Input */

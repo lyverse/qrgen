@@ -1,4 +1,5 @@
 import type { ContentType } from '@/types'
+import { SITE_URL } from '@/site'
 
 export type ContentFieldKind =
   | 'text'
@@ -34,19 +35,19 @@ export const contentTemplates: ContentTemplate[] = [
     type: 'text',
     label: 'Text',
     hint: 'Any plain text.',
-    value: 'Hello from QRgen',
+    value: '',
   },
   {
     type: 'url',
     label: 'Link',
     hint: 'A website or deep link.',
-    value: 'https://example.com',
+    value: SITE_URL,
   },
   {
     type: 'wifi',
     label: 'Wi-Fi',
     hint: 'Join a Wi-Fi network.',
-    value: 'WIFI:T:WPA;S:MyNetwork;P:my-password;;',
+    value: '',
     fields: [
       { key: 'ssid', label: 'Network name', placeholder: 'MyNetwork' },
       { key: 'password', label: 'Password', kind: 'password', placeholder: '••••••••' },
@@ -58,7 +59,7 @@ export const contentTemplates: ContentTemplate[] = [
     type: 'email',
     label: 'Email',
     hint: 'Pre-fill an email draft.',
-    value: 'mailto:hello@example.com?subject=Hi&body=Hello',
+    value: '',
     fields: [
       { key: 'to', label: 'To', kind: 'email', placeholder: 'hello@example.com' },
       { key: 'subject', label: 'Subject', placeholder: 'Hi' },
@@ -69,13 +70,13 @@ export const contentTemplates: ContentTemplate[] = [
     type: 'phone',
     label: 'Phone',
     hint: 'Start a call. Format: tel:<number>',
-    value: 'tel:+1234567890',
+    value: '',
   },
   {
     type: 'sms',
     label: 'SMS',
     hint: 'Pre-fill a text message.',
-    value: 'SMSTO:+1234567890:Hello',
+    value: '',
     fields: [
       { key: 'number', label: 'Phone number', kind: 'tel', placeholder: '+1234567890' },
       { key: 'message', label: 'Message', kind: 'textarea', placeholder: 'Hello' },
@@ -85,17 +86,7 @@ export const contentTemplates: ContentTemplate[] = [
     type: 'vcard',
     label: 'vCard',
     hint: 'Share a contact card.',
-    value: [
-      'BEGIN:VCARD',
-      'VERSION:3.0',
-      'N:Doe;Jane',
-      'FN:Jane Doe',
-      'ORG:Example Inc',
-      'TEL:+1234567890',
-      'EMAIL:jane@example.com',
-      'URL:https://example.com',
-      'END:VCARD',
-    ].join('\n'),
+    value: '',
     fields: [
       { key: 'firstName', label: 'First name', placeholder: 'Jane', half: true },
       { key: 'lastName', label: 'Last name', placeholder: 'Doe', half: true },

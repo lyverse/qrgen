@@ -767,6 +767,11 @@ body {
   font-family: var(--font-display);
 }
 
+.control-label-main {
+  display: inline-flex;
+  align-items: center;
+}
+
 .control-label.clickable {
   cursor: pointer;
   user-select: none;

@@ -6,7 +6,7 @@ export const defaultConfig: QrConfig = {
   contentType: 'url',
   content: 'https://example.com',
   ecc: 'M',
-  quietZone: 2,
+  quietZone: 4,
   fg: '#000000',
   bg: '#ffffff',
   transparentBg: false,

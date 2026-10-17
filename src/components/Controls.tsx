@@ -1,7 +1,8 @@
 import { useRef, useState } from 'react'
+import type { CSSProperties } from 'react'
 import { useStore } from '@/store/useStore'
 import { useShallow } from 'zustand/react/shallow'
-import { Image as ImageIcon, Settings2 } from 'lucide-react'
+import { Image as ImageIcon, Info, Settings2, X } from 'lucide-react'
 import { contentTemplates, templateFor } from '@/utils/templates'
 import { palettes } from '@/utils/palettes'
 import type { ContentType, DotStyle, Ecc, EyeStyle } from '@/types'
@@ -103,7 +104,10 @@ export function Controls() {
   const matrix = useStore((s) => s.matrix)
   const toggleSidebar = useStore((s) => s.toggleSidebar)
   const [showAdvanced, setShowAdvanced] = useState(false)
+  const [showQuietInfo, setShowQuietInfo] = useState(false)
+  const [quietPopupStyle, setQuietPopupStyle] = useState<CSSProperties>({})
   const fileRef = useRef<HTMLInputElement>(null)
+  const quietInfoRef = useRef<HTMLButtonElement>(null)
 
   const template = templateFor(config.contentType)
   const inverted = hexLuminance(config.fg) > hexLuminance(config.bg)
@@ -120,6 +124,23 @@ export function Controls() {
       updateConfig({ logo: typeof reader.result === 'string' ? reader.result : null })
     }
     reader.readAsDataURL(file)
+  }
+
+  const openQuietInfo = () => {
+    const rect = quietInfoRef.current?.getBoundingClientRect()
+    const popupWidth = 260
+    const padding = 8
+    if (rect) {
+      const left = Math.max(padding, Math.min(rect.right, window.innerWidth - popupWidth - padding))
+      setQuietPopupStyle({
+        position: 'fixed',
+        top: rect.bottom + 6,
+        left,
+        width: popupWidth,
+        zIndex: 40,
+      })
+    }
+    setShowQuietInfo(true)
   }
 
   return (
@@ -306,7 +327,19 @@ export function Controls() {
 
           <div className="qr-block">
             <label className="control-label">
-              Quiet Zone
+              <span className="control-label-main">
+                Quiet Zone
+                <button
+                  type="button"
+                  className="info-btn"
+                  ref={quietInfoRef}
+                  onClick={openQuietInfo}
+                  title="What is the quiet zone?"
+                  aria-label="About the quiet zone"
+                >
+                  <Info size={12} />
+                </button>
+              </span>
               <span className="control-value">{config.quietZone}</span>
             </label>
             <div className="range-group">
@@ -318,6 +351,27 @@ export function Controls() {
                 onChange={(e) => updateConfig({ quietZone: Number(e.target.value) })}
               />
             </div>
+            {showQuietInfo && (
+              <>
+                <div className="info-backdrop" onClick={() => setShowQuietInfo(false)} />
+                <div className="info-popup" style={quietPopupStyle}>
+                  <button
+                    className="info-popup-close"
+                    onClick={() => setShowQuietInfo(false)}
+                    aria-label="Close"
+                  >
+                    <X size={12} />
+                  </button>
+                  <h3>Quiet Zone</h3>
+                  <p>
+                    The empty margin that surrounds the code. The QR standard
+                    calls for at least 4 modules so scanners can separate the
+                    symbol from nearby graphics. Keep it at 4 unless you control
+                    the background and have a reason to trim it.
+                  </p>
+                </div>
+              </>
+            )}
           </div>
         </div>
 

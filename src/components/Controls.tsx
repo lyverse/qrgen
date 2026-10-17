@@ -169,6 +169,7 @@ export function Controls() {
   const matrix = useStore((s) => s.matrix)
   const toggleSidebar = useStore((s) => s.toggleSidebar)
   const [showAdvanced, setShowAdvanced] = useState(false)
+  const [showAppearance, setShowAppearance] = useState(false)
   const [showRaw, setShowRaw] = useState(false)
   const [showQuietInfo, setShowQuietInfo] = useState(false)
   const [quietPopupStyle, setQuietPopupStyle] = useState<CSSProperties>({})
@@ -281,51 +282,56 @@ export function Controls() {
 
         {/* Appearance */}
         <div className="control-group">
-          <label className="control-label">Appearance</label>
-          <div className="color-palettes">
-            {palettes.map((p) => (
-              <button
-                key={p.label}
-                className="palette-btn"
-                title={p.label}
-                onClick={() => updateConfig({ fg: p.fg, bg: p.bg, transparentBg: false })}
-              >
-                <span className="palette-swatch" style={{ background: p.fg }} />
-                <span className="palette-swatch" style={{ background: p.bg }} />
-              </button>
-            ))}
-          </div>
-          <div className="color-row">
-            <ColorField label="Code" value={config.fg} onChange={(v) => updateConfig({ fg: v })} />
-            <div className="color-divider" />
-            <ColorField label="Background" value={config.bg} onChange={(v) => updateConfig({ bg: v })} />
-          </div>
+          <label className="control-label clickable" onClick={() => setShowAppearance((v) => !v)}>
+            <span>Appearance</span>
+            <Chevron open={showAppearance} />
+          </label>
+          <div className={`collapsible-content${showAppearance ? ' collapsible-content--open' : ''}`}>
+            <div className="collapsible-inner">
+              <div className="color-palettes">
+                {palettes.map((p) => (
+                  <button
+                    key={p.label}
+                    className="palette-btn"
+                    title={p.label}
+                    onClick={() => updateConfig({ fg: p.fg, bg: p.bg, transparentBg: false })}
+                  >
+                    <span className="palette-swatch" style={{ background: p.fg }} />
+                    <span className="palette-swatch" style={{ background: p.bg }} />
+                  </button>
+                ))}
+              </div>
+              <div className="color-row">
+                <ColorField label="Code" value={config.fg} onChange={(v) => updateConfig({ fg: v })} />
+                <div className="color-divider" />
+                <ColorField label="Background" value={config.bg} onChange={(v) => updateConfig({ bg: v })} />
+              </div>
 
-          <span className="qr-sub-label">Background</span>
-          <div className="control-row">
-            <label className="control-label">Transparent</label>
-            <label className="toggle">
-              <input
-                type="checkbox"
-                checked={config.transparentBg}
-                onChange={(e) => updateConfig({ transparentBg: e.target.checked })}
-              />
-              <span className="toggle-slider" />
-            </label>
-          </div>
+              <span className="qr-sub-label">Background</span>
+              <div className="control-row">
+                <label className="control-label">Transparent</label>
+                <label className="toggle">
+                  <input
+                    type="checkbox"
+                    checked={config.transparentBg}
+                    onChange={(e) => updateConfig({ transparentBg: e.target.checked })}
+                  />
+                  <span className="toggle-slider" />
+                </label>
+              </div>
 
-          <span className="qr-sub-label">Gradient</span>
-          <div className="control-row">
-            <label className="control-label">Enabled</label>
-            <label className="toggle">
-              <input
-                type="checkbox"
-                checked={config.gradient.enabled}
-                onChange={(e) => updateConfig({ gradient: { ...config.gradient, enabled: e.target.checked } })}
-              />
-              <span className="toggle-slider" />
-            </label>
-          </div>
+              <span className="qr-sub-label">Gradient</span>
+              <div className="control-row">
+                <label className="control-label">Enabled</label>
+                <label className="toggle">
+                  <input
+                    type="checkbox"
+                    checked={config.gradient.enabled}
+                    onChange={(e) => updateConfig({ gradient: { ...config.gradient, enabled: e.target.checked } })}
+                  />
+                  <span className="toggle-slider" />
+                </label>
+              </div>
           {config.gradient.enabled && (
             <div className="qr-gradient-editor">
               <div className="color-row">

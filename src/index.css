@@ -1712,8 +1712,65 @@ body {
 
 /* ---------- QRgen ---------- */
 
-.qr-type-select {
+.qr-content-toolbar {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
   margin-bottom: 8px;
+}
+
+.qr-content-toolbar .qr-type-select {
+  flex: 1;
+  min-width: 0;
+  margin-bottom: 0;
+}
+
+.qr-raw-toggle {
+  flex: 0 0 auto;
+}
+
+.qr-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.qr-field--full { grid-column: 1 / -1; }
+.qr-field--half { grid-column: span 1; }
+
+.qr-field-label {
+  display: block;
+  margin-bottom: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.qr-field-input {
+  width: 100%;
+}
+
+.qr-field-textarea {
+  width: 100%;
+  min-height: 68px;
+  resize: vertical;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.qr-field-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+}
+
+.qr-field-toggle .qr-field-label {
+  margin-bottom: 0;
 }
 
 .qr-textarea {

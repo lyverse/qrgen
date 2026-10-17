@@ -2,8 +2,9 @@ import { useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
 import { useStore } from '@/store/useStore'
 import { useShallow } from 'zustand/react/shallow'
-import { Image as ImageIcon, Info, Settings2, X } from 'lucide-react'
-import { contentTemplates, templateFor } from '@/utils/templates'
+import { Image as ImageIcon, Info, Settings2, X, Code, List } from 'lucide-react'
+import { contentTemplates, templateFor, hasFields, getFieldValues, buildContent } from '@/utils/templates'
+import type { ContentField } from '@/utils/templates'
 import { palettes } from '@/utils/palettes'
 import type { ContentType, DotStyle, Ecc, EyeStyle } from '@/types'
 
@@ -97,6 +98,70 @@ function Chevron({
   )
 }
 
+function FieldInput({
+  field,
+  value,
+  onChange,
+}: {
+  field: ContentField
+  value: string
+  onChange: (value: string) => void
+}) {
+  const kind = field.kind ?? 'text'
+
+  if (kind === 'checkbox') {
+    return (
+      <div className="qr-field qr-field--full">
+        <div className="qr-field-toggle">
+          <span className="qr-field-label">{field.label}</span>
+          <label className="toggle">
+            <input
+              type="checkbox"
+              checked={value === 'true'}
+              onChange={(e) => onChange(e.target.checked ? 'true' : '')}
+            />
+            <span className="toggle-slider" />
+          </label>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className={`qr-field ${field.half ? 'qr-field--half' : 'qr-field--full'}`}>
+      <label className="qr-field-label">{field.label}</label>
+      {kind === 'select' ? (
+        <select
+          className="font-select"
+          value={value || field.options?.[0] || ''}
+          onChange={(e) => onChange(e.target.value)}
+        >
+          {field.options?.map((option) => (
+            <option key={option} value={option}>{option}</option>
+          ))}
+        </select>
+      ) : kind === 'textarea' ? (
+        <textarea
+          className="input qr-field-textarea"
+          value={value}
+          spellCheck={false}
+          placeholder={field.placeholder}
+          onChange={(e) => onChange(e.target.value)}
+        />
+      ) : (
+        <input
+          type={kind}
+          className="input qr-field-input"
+          value={value}
+          spellCheck={false}
+          placeholder={field.placeholder}
+          onChange={(e) => onChange(e.target.value)}
+        />
+      )}
+    </div>
+  )
+}
+
 export function Controls() {
   const config = useStore(useShallow((s) => s.config))
   const updateConfig = useStore((s) => s.updateConfig)
@@ -104,12 +169,15 @@ export function Controls() {
   const matrix = useStore((s) => s.matrix)
   const toggleSidebar = useStore((s) => s.toggleSidebar)
   const [showAdvanced, setShowAdvanced] = useState(false)
+  const [showRaw, setShowRaw] = useState(false)
   const [showQuietInfo, setShowQuietInfo] = useState(false)
   const [quietPopupStyle, setQuietPopupStyle] = useState<CSSProperties>({})
   const fileRef = useRef<HTMLInputElement>(null)
   const quietInfoRef = useRef<HTMLButtonElement>(null)
 
   const template = templateFor(config.contentType)
+  const structured = hasFields(config.contentType)
+  const fieldValues = getFieldValues(config.contentType, config.content)
   const inverted = hexLuminance(config.fg) > hexLuminance(config.bg)
 
   const warnings: string[] = []
@@ -158,25 +226,56 @@ export function Controls() {
             Content
             <span className="control-value">{config.content.length} chars</span>
           </label>
-          <select
-            className="font-select qr-type-select"
-            value={config.contentType}
-            onChange={(e) => {
-              const type = e.target.value as ContentType
-              updateConfig({ contentType: type, content: templateFor(type).value })
-            }}
-          >
-            {contentTemplates.map((t) => (
-              <option key={t.type} value={t.type}>{t.label}</option>
-            ))}
-          </select>
-          <textarea
-            className="input qr-textarea"
-            value={config.content}
-            spellCheck={false}
-            onChange={(e) => updateConfig({ content: e.target.value })}
-            placeholder="Enter content..."
-          />
+          <div className="qr-content-toolbar">
+            <select
+              className="font-select qr-type-select"
+              value={config.contentType}
+              onChange={(e) => {
+                const type = e.target.value as ContentType
+                setShowRaw(false)
+                updateConfig({ contentType: type, content: templateFor(type).value })
+              }}
+            >
+              {contentTemplates.map((t) => (
+                <option key={t.type} value={t.type}>{t.label}</option>
+              ))}
+            </select>
+            {structured && (
+              <button
+                type="button"
+                className="btn btn-xs qr-raw-toggle"
+                onClick={() => setShowRaw((v) => !v)}
+                title={showRaw ? 'Back to fields' : 'View raw code'}
+              >
+                {showRaw ? <List size={13} /> : <Code size={13} />}
+                {showRaw ? 'Fields' : 'Raw'}
+              </button>
+            )}
+          </div>
+          {structured && !showRaw ? (
+            <div className="qr-fields">
+              {template.fields?.map((field) => (
+                <FieldInput
+                  key={field.key}
+                  field={field}
+                  value={fieldValues[field.key] ?? ''}
+                  onChange={(value) =>
+                    updateConfig({
+                      content: buildContent(config.contentType, { ...fieldValues, [field.key]: value }),
+                    })
+                  }
+                />
+              ))}
+            </div>
+          ) : (
+            <textarea
+              className="input qr-textarea"
+              value={config.content}
+              spellCheck={false}
+              onChange={(e) => updateConfig({ content: e.target.value })}
+              placeholder="Enter content..."
+            />
+          )}
           <p className="help-text">{template.hint}</p>
         </div>
 

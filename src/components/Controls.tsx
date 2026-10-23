@@ -332,51 +332,53 @@ export function Controls() {
                   <span className="toggle-slider" />
                 </label>
               </div>
-          {config.gradient.enabled && (
-            <div className="qr-gradient-editor">
-              <div className="color-row">
-                <ColorField
-                  label="From"
-                  value={config.gradient.from}
-                  onChange={(v) => updateConfig({ gradient: { ...config.gradient, from: v } })}
-                />
-                <div className="color-divider" />
-                <ColorField
-                  label="To"
-                  value={config.gradient.to}
-                  onChange={(v) => updateConfig({ gradient: { ...config.gradient, to: v } })}
-                />
-              </div>
-              <div className="control-row">
-                <label className="control-label">Direction</label>
-                <select
-                  className="preset-select"
-                  value={config.gradient.type}
-                  onChange={(e) =>
-                    updateConfig({
-                      gradient: { ...config.gradient, type: e.target.value as 'linear' | 'radial' },
-                    })
-                  }
-                >
-                  <option value="linear">Linear</option>
-                  <option value="radial">Radial</option>
-                </select>
-              </div>
-              {config.gradient.type === 'linear' && (
-                <div className="range-group">
-                  <input
-                    type="range"
-                    min={0}
-                    max={360}
-                    step={5}
-                    value={config.gradient.angle}
-                    onChange={(e) => updateConfig({ gradient: { ...config.gradient, angle: Number(e.target.value) } })}
-                  />
-                  <span className="control-value">{config.gradient.angle}°</span>
+              {config.gradient.enabled && (
+                <div className="qr-gradient-editor">
+                  <div className="color-row">
+                    <ColorField
+                      label="From"
+                      value={config.gradient.from}
+                      onChange={(v) => updateConfig({ gradient: { ...config.gradient, from: v } })}
+                    />
+                    <div className="color-divider" />
+                    <ColorField
+                      label="To"
+                      value={config.gradient.to}
+                      onChange={(v) => updateConfig({ gradient: { ...config.gradient, to: v } })}
+                    />
+                  </div>
+                  <div className="control-row">
+                    <label className="control-label">Direction</label>
+                    <select
+                      className="preset-select"
+                      value={config.gradient.type}
+                      onChange={(e) =>
+                        updateConfig({
+                          gradient: { ...config.gradient, type: e.target.value as 'linear' | 'radial' },
+                        })
+                      }
+                    >
+                      <option value="linear">Linear</option>
+                      <option value="radial">Radial</option>
+                    </select>
+                  </div>
+                  {config.gradient.type === 'linear' && (
+                    <div className="range-group">
+                      <input
+                        type="range"
+                        min={0}
+                        max={360}
+                        step={5}
+                        value={config.gradient.angle}
+                        onChange={(e) => updateConfig({ gradient: { ...config.gradient, angle: Number(e.target.value) } })}
+                      />
+                      <span className="control-value">{config.gradient.angle}°</span>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
-          )}
+          </div>
         </div>
 
         {/* Shape */}
